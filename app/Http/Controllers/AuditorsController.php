@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Auditor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AuditorsRequest;
 
 class AuditorsController extends Controller
 {
@@ -37,29 +38,9 @@ class AuditorsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AuditorsRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'company' => 'required',
-            'address.suburb' => 'required_with:address.address_1',
-            'address.post_code' => 'required_with:address.address_1|max:10',
-            'address.state' => 'required_with:address.address_1',
-            'address.country' => 'required_with:address.address_1',
-        ], [
-            'address.suburb.required_with' => 'The suburb field is required.',
-            'address.post_code.required_with' => 'The post code field is required.',
-            'address.post_code.max' => 'The post code may not be greater than 10 characters.',
-            'address.state.required_with' => 'The state is required.',
-            'address.country.required_with' => 'The country is required.',
-        ]);
-
-        $auditor = Auditor::create($request->all());
-
-        if ($request->address['address_1']) {
-            $auditor->address()
-                ->create($request->address);
-        }
+        $request->addAuditor();
 
         session()->flash('success', 'The auditor was successfully created.');
         return redirect()->route('auditors.index');
@@ -98,34 +79,9 @@ class AuditorsController extends Controller
      * @param  \App\Auditor
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Auditor $auditor)
+    public function update(AuditorsRequest $request, Auditor $auditor)
     {
-        $request->validate([
-            'name' => 'required',
-            'company' => 'required',
-            'address.suburb' => 'required_with:address.address_1',
-            'address.post_code' => 'required_with:address.address_1|max:10',
-            'address.state' => 'required_with:address.address_1',
-            'address.country' => 'required_with:address.address_1',
-        ], [
-            'address.suburb.required_with' => 'The suburb field is required.',
-            'address.post_code.required_with' => 'The post code field is required.',
-            'address.post_code.max' => 'The post code may not be greater than 10 characters.',
-            'address.state.required_with' => 'The state is required.',
-            'address.country.required_with' => 'The country is required.',
-        ]);
-
-        $auditor->update($request->all());
-
-        // lets see if there is an address
-        if ($request->address['address_1']) {
-            $auditor->address()
-                ->create($request->address);
-        } else {
-            // lets delete any previously saved addresses
-            $auditor->address()
-                ->delete();
-        }
+        $request->updateAuditor($auditor);
 
         session()->flash('success', 'The auditor was successfully updated.');
         return redirect()->route('auditors.index');
