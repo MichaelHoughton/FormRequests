@@ -45,7 +45,7 @@
                                             'url' => '/auditors/'.$auditor->id,
                                         ]) !!}
 
-                                            <a class="btn btn-primary" href="/admin/auditors/{{ $auditor->id }}">View</a>
+                                            <a class="btn btn-primary" href="/auditors/{{ $auditor->id }}">View</a>
 
                                             <button class="btn btn-danger">Delete</button>
 
