@@ -140,6 +140,27 @@ class AuditorsTest extends TestCase
     }
 
     /** @test */
+    public function a_user_updates_an_existing_address()
+    {
+        $auditor = $this->create('Auditor');
+        $auditor = $this->create('Address', [
+            'auditor_id' => $auditor->id,
+        ]);
+
+        $attributes = $this->attributes('Auditor');
+        $attributes['address'] = $this->attributes('Address');
+
+        $this->patch('/auditors/'.$auditor->id, $attributes)
+            ->assertStatus(302)
+            ->assertSessionHas('success')
+            ->assertRedirect('/auditors');
+
+        $auditor = Auditor::find($auditor->id);
+        $this->assertNotNull($auditor->address);
+        $this->assertEquals($attributes['address']['address_1'], $auditor->address->address_1);
+    }
+
+    /** @test */
     public function a_user_updates_an_auditor_an_removes_an_address()
     {
         $auditor = $this->create('Auditor');

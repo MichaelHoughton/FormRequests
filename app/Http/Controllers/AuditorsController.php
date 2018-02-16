@@ -119,8 +119,13 @@ class AuditorsController extends Controller
 
         // lets see if there is an address
         if ($request->address['address_1']) {
-            $auditor->address()
-                ->create($request->address);
+            $address = $auditor->address();
+            if ($address) {
+                $address->update($request->address);
+            } else {
+                $auditor->address()
+                    ->create($request->address);
+            }
         } else {
             // lets delete any previously saved addresses
             $auditor->address()
