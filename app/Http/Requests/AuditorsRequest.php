@@ -71,8 +71,13 @@ class AuditorsRequest extends FormRequest
 
         // lets see if there is an address
         if ($this->address['address_1']) {
-            $auditor->address()
-                ->create($this->address);
+            $address = $auditor->address;
+            if ($address) {
+                $address->update($this->address);
+            } else {
+                $auditor->address()
+                    ->create($this->address);
+            }
         } else {
             // lets delete any previously saved addresses
             $auditor->address()
